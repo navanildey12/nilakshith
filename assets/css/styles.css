@@ -2217,3 +2217,62 @@ header {
     font-size: var(--text-xl);
   }
 }
+
+/* ============================================================
+   TAGEMBED GOOGLE REVIEWS WIDGET — section #reviews
+   ============================================================ */
+
+/* Outer wrapper: constrained width, overflow-safe */
+.tagembed-widget-container {
+  width: 100%;
+  max-width: min(1200px, 100vw);
+  margin: var(--space-8) auto;
+  min-height: 500px;
+  overflow-x: hidden;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+/* Inner Tagembed target div */
+.tagembed-widget-container .tagembed-widget {
+  width: 100% !important;
+  min-height: 480px;
+}
+
+/* "View All Reviews on Google" CTA row */
+.reviews-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+/* Loading shimmer placeholder */
+@keyframes shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+.tagembed-widget:empty {
+  display: block;
+  height: 480px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    #eef0f4 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tagembed-widget-container {
+    padding: var(--space-2);
+    margin: var(--space-6) auto;
+    border-radius: var(--radius-md);
+  }
+}
