@@ -9,8 +9,16 @@
   <meta property="og:title" content="Broadband Internet Plans — Nilakshith Enterprise" />
   <meta property="og:description" content="Internet plans from 30 to 150 Mbps starting at ₹400/month in Silchar and Barak Valley." />
 
+  <!-- Preload critical resources -->
+  <link rel="preload" as="image" href="assets/img/logo_trans.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- Google Fonts deferred to avoid render-blocking -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" /></noscript>
 </head>
 <body>
 
@@ -33,7 +41,7 @@
       <div class="navbar__inner">
         <!-- Logo -->
         <a href="index.html" class="navbar__logo" aria-label="Nilakshith Enterprise — home">
-          <img src="assets/img/logo_trans.png" alt="" class="navbar__logo-img" />
+          <picture><source srcset="assets/img/logo_trans.webp" type="image/webp" /><img src="assets/img/logo_trans.png" alt="Nilakshith Enterprise logo" class="navbar__logo-img" width="68" height="68" fetchpriority="high" /></picture>
           <div>
             <div>
               <span class="logo-name">Nilakshith</span>

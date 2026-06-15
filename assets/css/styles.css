@@ -3,8 +3,7 @@
    Nilakshith Enterprise — Internet, CCTV & IT Services
    ============================================================ */
 
-/* --- GOOGLE FONTS IMPORT --- */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 
 :root {
   /* --- CORE PALETTE --- */
@@ -325,12 +324,12 @@ ul, ol {
   align-items: center;
   justify-content: center;
   opacity: 1;
-  visibility: visible;
-  transition: opacity 300ms ease, visibility 300ms ease;
+  pointer-events: auto;
+  transition: opacity 300ms ease;
 }
 .preloader.loaded {
   opacity: 0;
-  visibility: hidden;
+  pointer-events: none;
 }
 .preloader__label {
   font-family: 'IBM Plex Mono', monospace;
