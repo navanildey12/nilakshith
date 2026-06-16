@@ -95,12 +95,17 @@
   <!-- ══════════════════════════════════════════
        NAVIGATION
        ══════════════════════════════════════════ -->
-  <header>
+  <!-- HEADER_START -->
+<header>
     <nav class="navbar animate-load header-slide-down" role="navigation" aria-label="Main navigation">
       <div class="navbar__inner">
+
         <!-- Logo -->
         <a href="index.html" class="navbar__logo" aria-label="Nilakshith Enterprise — home">
-          <picture><source srcset="assets/img/logo_trans.webp" type="image/webp" /><img src="assets/img/logo_trans.png" alt="Nilakshith Enterprise logo" class="navbar__logo-img" width="68" height="68" fetchpriority="high" /></picture>
+          <picture>
+            <source srcset="assets/img/logo_trans.webp" type="image/webp" />
+            <img src="assets/img/logo_trans.png" alt="Nilakshith Enterprise logo" class="navbar__logo-img" width="68" height="68" fetchpriority="high" />
+          </picture>
           <div>
             <div>
               <span class="logo-name">Nilakshith</span>
@@ -109,20 +114,21 @@
             <div class="logo-tagline">Internet | CCTV | IT Services</div>
           </div>
         </a>
-        
+
         <!-- Desktop nav links -->
         <ul class="nav-menu" role="list">
-          <li><a href="index.html"      class="nav-menu__link">Home</a></li>
-          <li><a href="broadband.html"  class="nav-menu__link">Broadband</a></li>
-          <li><a href="cctv.html"       class="nav-menu__link">CCTV</a></li>
-          <li><a href="networking.html" class="nav-menu__link">Networking</a></li>
-          <li><a href="about.html"      class="nav-menu__link">About</a></li>
-          <li><a href="contact.html"    class="nav-menu__link">Contact</a></li>
+          <li class="nav-menu__item"><a href="index.html"      class="nav-menu__link">Home</a></li>
+          <li class="nav-menu__item"><a href="broadband.html"  class="nav-menu__link">Broadband</a></li>
+          <li class="nav-menu__item"><a href="cctv.html"       class="nav-menu__link">CCTV</a></li>
+          <li class="nav-menu__item"><a href="networking.html" class="nav-menu__link">Networking</a></li>
+          <li class="nav-menu__item"><a href="about.html"      class="nav-menu__link">About</a></li>
+          <li class="nav-menu__item"><a href="contact.html"    class="nav-menu__link">Contact</a></li>
         </ul>
 
         <!-- CTA (desktop) -->
-        <a href="https://wa.me/919706817032?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20IT%20networking."
-           class="navbar__cta-btn desktop-only" target="_blank" rel="noopener noreferrer" data-wa-cta="navbar-networking">
+        <a href="https://wa.me/919706817032?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20your%20services."
+           class="navbar__cta-btn desktop-only" target="_blank" rel="noopener noreferrer"
+           aria-label="Chat on WhatsApp" data-wa-cta="navbar">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.965L2 22l5.233-1.371a9.944 9.944 0 0 0 4.773 1.216h.004c5.506 0 9.989-4.478 9.99-9.984A9.995 9.995 0 0 0 12.012 2zm5.793 13.593c-.319.897-1.558 1.637-2.146 1.745-.589.108-1.168.162-3.834-.912-3.41-1.376-5.607-4.85-5.777-5.077-.17-.228-1.357-1.802-1.357-3.437 0-1.636.852-2.438 1.157-2.775.305-.336.666-.42.887-.42h.638c.204 0 .476.006.697.528.221.522.756 1.834.821 1.971.066.137.108.297.017.476-.09.18-.135.297-.272.456-.137.159-.289.356-.413.476-.137.137-.282.287-.121.562.161.275.717 1.183 1.536 1.91.543.484.992.836 1.357 1.019.365.183.578.115.756-.09.178-.205.757-.88 1.012-1.222.256-.341.512-.284.862-.153.35.13.222.102 2.222 1.102.13.065.215.297.16.592z"/></svg>
           WhatsApp
         </a>
@@ -154,6 +160,7 @@
       </div>
     </div>
   </header>
+<!-- HEADER_END -->
 
   <main id="main">
 
@@ -432,7 +439,8 @@
 
   </main>
 
-  <footer class="footer" role="contentinfo">
+  <!-- FOOTER_START -->
+<footer class="footer" role="contentinfo">
     <div class="footer__main">
       <div class="container">
         <div class="footer__grid">
@@ -476,8 +484,8 @@
             <p class="footer__heading">Services</p>
             <ul class="footer__links" role="list">
               <li><a href="broadband.html">Internet Broadband</a></li>
-              <li><a href="cctv.html">CCTV &amp; Surveillance</a></li>
-              <li><a href="networking.html">Networking &amp; IT</a></li>
+              <li><a href="cctv.html">CCTV & Surveillance</a></li>
+              <li><a href="networking.html">Networking & IT</a></li>
               <li><a href="cctv.html#amc">CCTV AMC</a></li>
             </ul>
           </div>
@@ -530,7 +538,7 @@
   <!-- WhatsApp FAB -->
   <div class="wa-float-wrapper">
     <div class="wa-tooltip">Chat on WhatsApp</div>
-    <a href="https://wa.me/919706817032?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20IT%20networking."
+    <a href="https://wa.me/919706817032?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20your%20services."
        class="wa-float"
        target="_blank" rel="noopener noreferrer"
        aria-label="Chat on WhatsApp"
@@ -546,5 +554,6 @@
 
   <!-- JS -->
   <script src="assets/js/main.js" defer></script>
+<!-- FOOTER_END -->
 </body>
 </html>

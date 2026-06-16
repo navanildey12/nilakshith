@@ -21,9 +21,9 @@ function initPreloader() {
   const done = () => loader.classList.add('loaded');
 
   if (document.readyState === 'complete') {
-    setTimeout(done, 200);
+    done();
   } else {
-    window.addEventListener('load', () => setTimeout(done, 300));
+    window.addEventListener('load', done);
   }
 }
 
@@ -442,6 +442,213 @@ function initWhatsAppModal() {
   }
 }
 
+/**
+ * 13. NATIVE GOOGLE FORM INTEGRATION & DYNAMIC LOGIC
+ */
+function initEnquiryForm() {
+  const form = qs('#enquiry-form');
+  if (!form) return;
+
+  const successCard = qs('#form-success-card');
+  const errorCard = qs('#form-error-card');
+  const serviceSelect = qs('#form-service');
+  const submitBtn = qs('.form-submit-btn', form);
+  const btnText = qs('.btn-text', submitBtn);
+  const btnSpinner = qs('.btn-spinner', submitBtn);
+
+  const condBroadband = qs('#form-cond-broadband');
+  const condCctv = qs('#form-cond-cctv');
+  const condNetworking = qs('#form-cond-networking');
+
+  // Input elements for conditional fields
+  const broadbandPlan = qs('#form-broadband-plan');
+  const cctvCameras = qs('#form-cctv-cameras');
+  const networkingReqs = qs('#form-networking-reqs');
+
+  // Helper to show/hide group and update "required" attributes on inputs
+  function toggleGroup(group, show, inputEl) {
+    if (!group) return;
+    if (show) {
+      group.classList.remove('hidden');
+      if (inputEl) inputEl.setAttribute('required', 'true');
+    } else {
+      group.classList.add('hidden');
+      if (inputEl) {
+        inputEl.removeAttribute('required');
+        inputEl.value = ''; // Reset value
+        // Clear validation errors
+        const groupParent = inputEl.closest('.form-group');
+        if (groupParent) groupParent.classList.remove('has-error');
+      }
+    }
+  }
+
+  // Handle Dynamic Fields
+  if (serviceSelect) {
+    serviceSelect.addEventListener('change', () => {
+      const val = serviceSelect.value;
+      
+      toggleGroup(condBroadband, val === 'Internet Broadband', broadbandPlan);
+      toggleGroup(condCctv, val === 'CCTV Installation', cctvCameras);
+      toggleGroup(condNetworking, val === 'Networking Services', networkingReqs);
+    });
+  }
+
+  // Field validation helper
+  function validateField(field) {
+    const parent = field.closest('.form-group');
+    if (!parent) return true;
+
+    let isValid = true;
+    
+    // Check built-in HTML5 validation
+    if (!field.checkValidity()) {
+      isValid = false;
+    }
+
+    // Special regex check for 10-digit Indian phone number
+    if (field.id === 'form-phone') {
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(field.value)) {
+        isValid = false;
+      }
+    }
+
+    // Special regex check for 6-digit Pincode
+    if (field.id === 'form-pincode') {
+      const pinRegex = /^\d{6}$/;
+      if (field.value && !pinRegex.test(field.value)) {
+        isValid = false;
+      }
+    }
+
+    if (isValid) {
+      parent.classList.remove('has-error');
+    } else {
+      parent.classList.add('has-error');
+    }
+
+    return isValid;
+  }
+
+  // Add validation on blur and input to keep UX high-quality
+  const inputsToValidate = form.querySelectorAll('input, select, textarea');
+  inputsToValidate.forEach(field => {
+    ['blur', 'input', 'change'].forEach(eventType => {
+      field.addEventListener(eventType, () => {
+        const parent = field.closest('.form-group');
+        if (parent && (parent.classList.contains('has-error') || eventType === 'blur')) {
+          validateField(field);
+        }
+      });
+    });
+  });
+
+  // Handle Submit
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Validate all fields
+    let formIsValid = true;
+    let firstErrorField = null;
+
+    inputsToValidate.forEach(field => {
+      // Check if field is visible/active (not inside a hidden group)
+      const condGroup = field.closest('.form-conditional-group');
+      const isFieldActive = !condGroup || !condGroup.classList.contains('hidden');
+
+      if (isFieldActive) {
+        const isFieldValid = validateField(field);
+        if (!isFieldValid) {
+          formIsValid = false;
+          if (!firstErrorField) firstErrorField = field;
+        }
+      }
+    });
+
+    if (!formIsValid) {
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorField.focus();
+      }
+      return;
+    }
+
+    // Capture name before form reset
+    const userName = qs('#form-name')?.value || 'Customer';
+
+    // Show loading spinner
+    submitBtn.setAttribute('disabled', 'true');
+    if (btnText) btnText.textContent = 'Submitting...';
+    if (btnSpinner) btnSpinner.classList.remove('hidden');
+
+    const formData = new FormData(form);
+
+    // Google Form submission action URL
+    const actionURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdJ38JpziOKJ7DEL5AquCv7ao8jGfxm9RF2m8leQOoaCyuNaQ/formResponse';
+
+    fetch(actionURL, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors'
+    })
+    .then(() => {
+      // Opaque response is expected due to CORS, treated as success
+      form.reset();
+      
+      // Reset active categories
+      toggleGroup(condBroadband, false, broadbandPlan);
+      toggleGroup(condCctv, false, cctvCameras);
+      toggleGroup(condNetworking, false, networkingReqs);
+
+      // Populate success card name
+      const successNameSpan = qs('#success-name');
+      if (successNameSpan) successNameSpan.textContent = userName;
+
+      // Show success card
+      form.classList.add('hidden');
+      if (successCard) successCard.classList.remove('hidden');
+      
+      // Scroll to result card
+      successCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .catch((error) => {
+      console.error('Submission error:', error);
+      // Show error card
+      form.classList.add('hidden');
+      if (errorCard) errorCard.classList.remove('hidden');
+      
+      errorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .finally(() => {
+      // Restore submit button state
+      submitBtn.removeAttribute('disabled');
+      if (btnText) btnText.textContent = 'Submit Enquiry';
+      if (btnSpinner) btnSpinner.classList.add('hidden');
+    });
+  });
+
+  // Reset and Retry triggers
+  const resetBtn = qs('#form-reset-btn');
+  const retryBtn = qs('#form-retry-btn');
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (successCard) successCard.classList.add('hidden');
+      form.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => {
+      if (errorCard) errorCard.classList.add('hidden');
+      form.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+}
+
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   initPreloader();
@@ -455,4 +662,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initFloatingWhatsApp();
   initStepConnectors();
   initWhatsAppModal();
+  initEnquiryForm();
 });

@@ -105,7 +105,8 @@
   <!-- ══════════════════════════════════════════
        NAVIGATION
        ══════════════════════════════════════════ -->
-  <header>
+  <!-- HEADER_START -->
+<header>
     <nav class="navbar animate-load header-slide-down" role="navigation" aria-label="Main navigation">
       <div class="navbar__inner">
 
@@ -169,6 +170,7 @@
       </div>
     </div>
   </header>
+<!-- HEADER_END -->
 
   <!-- ══════════════════════════════════════════
        MAIN CONTENT
@@ -662,15 +664,192 @@
 
         <div class="contact-grid">
           <!-- Google Form Embed Wrapper -->
-          <div class="google-form-frame-wrapper" data-animate="fade-right">
-            <iframe
-              src="https://docs.google.com/forms/d/e/1FAIpQLSdJ38JpziOKJ7DEL5AquCv7ao8jGfxm9RF2m8leQOoaCyuNaQ/viewform?embedded=true"
-              width="100%"
-              height="680"
-              style="border: 0;"
-              title="Nilakshith Enterprise enquiry form"
-              loading="lazy"
-            >Loading form…</iframe>
+          <!-- Native Contact Form -->
+          <div class="enquiry-card animate-load" data-animate="fade-right">
+            <form id="enquiry-form" class="enquiry-form" novalidate>
+              <div class="form-section">
+                <h3 class="form-section-title">1. Personal Details</h3>
+                <div class="form-row-two">
+                  <div class="form-group">
+                    <label for="form-name" class="form-label">Full Name <span class="required">*</span></label>
+                    <input type="text" id="form-name" name="entry.2017955908" class="form-input" placeholder="e.g. John Doe" required autocomplete="name" />
+                    <span class="form-error-msg">Please enter your full name</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="form-phone" class="form-label">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="form-phone" name="entry.1532056414" class="form-input" placeholder="10-digit mobile number" required pattern="[6-9][0-9]{9}" autocomplete="tel" inputmode="tel" />
+                    <span class="form-error-msg">Please enter a valid 10-digit Indian phone number</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="form-email" class="form-label">Email Address <span class="optional">(Optional)</span></label>
+                  <input type="email" id="form-email" name="entry.1876613078" class="form-input" placeholder="e.g. john@example.com" autocomplete="email" />
+                  <span class="form-error-msg">Please enter a valid email address</span>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="form-section-title">2. Service Details</h3>
+                <div class="form-group">
+                  <label for="form-service" class="form-label">Required Service <span class="required">*</span></label>
+                  <select id="form-service" name="entry.867996569" class="form-select" required>
+                    <option value="" disabled selected>Choose a service...</option>
+                    <option value="Internet Broadband">Internet Broadband</option>
+                    <option value="CCTV Installation">CCTV Installation</option>
+                    <option value="Networking Services">Networking Services</option>
+                  </select>
+                  <span class="form-error-msg">Please select a service</span>
+                </div>
+
+                <!-- Conditional Section: Broadband -->
+                <div id="form-cond-broadband" class="form-conditional-group hidden">
+                  <div class="form-group">
+                    <label for="form-broadband-plan" class="form-label">Select Internet Broadband Plan <span class="required">*</span></label>
+                    <select id="form-broadband-plan" name="entry.226944424" class="form-select">
+                      <option value="" disabled selected>Choose a plan...</option>
+                      <option value="30mbps Rs.400">30 Mbps — Rs. 400/month</option>
+                      <option value="40mbps Rs.500">40 Mbps — Rs. 500/month</option>
+                      <option value="50mbps Rs.600">50 Mbps — Rs. 600/month</option>
+                      <option value="80mbps Rs.700">80 Mbps — Rs. 700/month</option>
+                      <option value="100mbps Rs.800">100 Mbps — Rs. 800/month</option>
+                      <option value="150mbps Rs.1000">150 Mbps — Rs. 1000/month</option>
+                    </select>
+                    <span class="form-error-msg">Please select a plan</span>
+                  </div>
+                  <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="form-iptv" name="entry.389064478" value="Yes, add IPTV for Rs. 235" />
+                      <span class="checkbox-box"></span>
+                      <span class="checkbox-text">Add IPTV Box Service (+ Rs. 235/month)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Conditional Section: CCTV -->
+                <div id="form-cond-cctv" class="form-conditional-group hidden">
+                  <div class="form-group">
+                    <label for="form-cctv-cameras" class="form-label">Number of CCTV Cameras <span class="required">*</span></label>
+                    <input type="number" id="form-cctv-cameras" name="entry.435521989" class="form-input" min="1" max="100" placeholder="e.g. 4" />
+                    <span class="form-error-msg">Please enter a valid number of cameras (min 1)</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="form-cctv-reqs" class="form-label">CCTV Installation Requirements <span class="optional">(Optional)</span></label>
+                    <textarea id="form-cctv-reqs" name="entry.2129940172" class="form-textarea" placeholder="Describe camera placement, night-vision needs, storage requirements..."></textarea>
+                  </div>
+                </div>
+
+                <!-- Conditional Section: Networking -->
+                <div id="form-cond-networking" class="form-conditional-group hidden">
+                  <div class="form-group">
+                    <label for="form-networking-reqs" class="form-label">Networking Service Requirements <span class="required">*</span></label>
+                    <textarea id="form-networking-reqs" name="entry.2021396544" class="form-textarea" placeholder="Describe your corporate or home networking needs..."></textarea>
+                    <span class="form-error-msg">Please describe your requirements</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="form-section-title">3. Installation Address</h3>
+                <div class="form-group">
+                  <label for="form-address" class="form-label">Complete Address <span class="required">*</span></label>
+                  <textarea id="form-address" name="entry.973863464" class="form-textarea" placeholder="Building, Street, Landmark, Town/City" required></textarea>
+                  <span class="form-error-msg">Please enter your complete installation address</span>
+                </div>
+                <div class="form-row-two">
+                  <div class="form-group">
+                    <label for="form-area" class="form-label">Area / Locality <span class="optional">(Optional)</span></label>
+                    <input type="text" id="form-area" name="entry.729516900" class="form-input" placeholder="e.g. Rangirkhari" />
+                  </div>
+                  <div class="form-group">
+                    <label for="form-pincode" class="form-label">Pincode <span class="required">*</span></label>
+                    <input type="text" id="form-pincode" name="entry.1573955057" class="form-input" placeholder="6-digit PIN" required pattern="[0-9]{6}" inputmode="numeric" />
+                    <span class="form-error-msg">Please enter a valid 6-digit Pincode</span>
+                  </div>
+                </div>
+                <div class="form-row-two">
+                  <div class="form-group">
+                    <label for="form-district" class="form-label">District <span class="optional">(Optional)</span></label>
+                    <select id="form-district" name="entry.866563003" class="form-select">
+                      <option value="Cachar (Silchar)">Cachar (Silchar)</option>
+                      <option value="Karimganj">Karimganj</option>
+                      <option value="Hailakandi">Hailakandi</option>
+                    </select>
+                  </div>
+                  <!-- Hidden state field -->
+                  <input type="hidden" name="entry.513621642" value="Assam" />
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="form-section-title">4. Preferences</h3>
+                <div class="form-row-two">
+                  <div class="form-group">
+                    <label for="form-timeslot" class="form-label">Preferred Time Slot</label>
+                    <select id="form-timeslot" name="entry.128483241" class="form-select">
+                      <option value="Anytime" selected>Anytime</option>
+                      <option value="Morning (9am - 12pm)">Morning (9 AM - 12 PM)</option>
+                      <option value="Afternoon (12pm - 4pm)">Afternoon (12 PM - 4 PM)</option>
+                      <option value="Evening (4pm - 7pm)">Evening (4 PM - 7 PM)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="form-referral" class="form-label">How did you hear about us?</label>
+                    <select id="form-referral" name="entry.1990274724" class="form-select">
+                      <option value="Google Search" selected>Google Search</option>
+                      <option value="Social Media">Social Media</option>
+                      <option value="Friend/Referral">Friend/Referral</option>
+                      <option value="Local Advertisement">Local Advertisement</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Is this your first time using our services?</label>
+                  <div class="radio-group">
+                    <label class="radio-label">
+                      <input type="radio" name="entry.258092902" value="Yes, I am a new customer" checked />
+                      <span class="radio-circle"></span>
+                      <span class="radio-text">Yes, I am a new customer</span>
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="entry.258092902" value="No, I am an existing customer" />
+                      <span class="radio-circle"></span>
+                      <span class="radio-text">No, I am an existing customer</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn--primary btn--full form-submit-btn">
+                <span class="btn-text">Submit Enquiry</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+            </form>
+
+            <!-- Success Card -->
+            <div id="form-success-card" class="form-result-card hidden">
+              <div class="success-icon-wrapper">
+                <div class="success-checkmark">
+                  <div class="checkmark-circle"></div>
+                  <div class="checkmark-stem"></div>
+                  <div class="checkmark-kick"></div>
+                </div>
+              </div>
+              <h3 class="result-title">Enquiry Sent Successfully!</h3>
+              <p class="result-message">Thank you, <strong id="success-name">Customer</strong>. We have received your request and our team will get in touch with you shortly.</p>
+              <button id="form-reset-btn" class="btn btn--outline" style="margin-top:var(--space-2);">Send Another Enquiry</button>
+            </div>
+
+            <!-- Error Card -->
+            <div id="form-error-card" class="form-result-card hidden">
+              <div class="error-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <h3 class="result-title">Submission Failed</h3>
+              <p class="result-message">We encountered a network error submitting your enquiry. Please check your internet connection or try again.</p>
+              <button id="form-retry-btn" class="btn btn--primary" style="margin-top:var(--space-2);">Retry Submission</button>
+            </div>
           </div>
 
           <!-- Contact details card -->
@@ -757,7 +936,8 @@
   <!-- ══════════════════════════════════════════
        FOOTER
        ══════════════════════════════════════════ -->
-  <footer class="footer" role="contentinfo">
+  <!-- FOOTER_START -->
+<footer class="footer" role="contentinfo">
     <div class="footer__main">
       <div class="container">
         <div class="footer__grid">
@@ -866,11 +1046,11 @@
 
   <!-- Scroll to top -->
   <button class="scroll-to-top" aria-label="Scroll to top">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
   </button>
 
   <!-- JS -->
   <script src="assets/js/main.js" defer></script>
-
+<!-- FOOTER_END -->
 </body>
 </html>
