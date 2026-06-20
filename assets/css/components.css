@@ -303,9 +303,30 @@
   
   .hero,
   section.hero {
-    padding-top: 80px !important;
+    padding-top: 66px !important;
     padding-bottom: 40px !important;
-    padding-block: 80px 40px !important;
+    padding-block: 66px 40px !important;
+  }
+
+  .hero__badge {
+    padding: 8px 14px 8px 12px !important;
+    border-radius: 12px !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+
+  .hero__badge-dot {
+    margin-top: 5px !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .hero__badge-text {
+    font-size: 0.76rem !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+    display: block !important;
+    font-weight: 500 !important;
   }
   
   .container {
