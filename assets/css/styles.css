@@ -1770,6 +1770,15 @@ header {
   color: rgba(255, 255, 255, 0.70);
 }
 
+.footer__copyright a {
+  color: rgba(255, 255, 255, 0.40);
+  transition: color var(--transition-base);
+}
+.footer__copyright a:hover {
+  color: rgba(255, 255, 255, 0.70);
+  text-decoration: underline;
+}
+
 @media (max-width: 680px) {
   .footer__bottom {
     flex-direction: column;
