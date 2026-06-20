@@ -93,6 +93,11 @@ function initMobileMenu() {
     toggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
     if (firstFocusable) firstFocusable.focus();
+
+    const mainEl = qs('#main');
+    const footerEl = qs('footer');
+    if (mainEl) mainEl.setAttribute('aria-hidden', 'true');
+    if (footerEl) footerEl.setAttribute('aria-hidden', 'true');
   }
 
   function closeMenu() {
@@ -101,6 +106,11 @@ function initMobileMenu() {
     drawer.classList.remove('open');
     toggle.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+
+    const mainEl = qs('#main');
+    const footerEl = qs('footer');
+    if (mainEl) mainEl.removeAttribute('aria-hidden');
+    if (footerEl) footerEl.removeAttribute('aria-hidden');
   }
 
   toggle.addEventListener('click', () => {
@@ -228,29 +238,55 @@ function initFAQ() {
   const items = qsAll('.faq-item');
   if (!items.length) return;
 
-  items.forEach((item) => {
+  items.forEach((item, idx) => {
     const question = qs('.faq-item__question', item);
     const answer = qs('.faq-item__answer', item);
     if (!question || !answer) return;
 
-    question.addEventListener('click', () => {
+    // Set unique IDs for relation mapping
+    const questionId = question.id || `faq-q-${idx}`;
+    const answerId = answer.id || `faq-a-${idx}`;
+    question.id = questionId;
+    answer.id = answerId;
+
+    // Dynamic A11y attributes
+    question.setAttribute('tabindex', '0');
+    question.setAttribute('role', 'button');
+    question.setAttribute('aria-expanded', 'false');
+    question.setAttribute('aria-controls', answerId);
+
+    function toggleFAQ() {
       const isOpen = item.classList.contains('open');
 
       // Close all other FAQs (accordion functionality)
       items.forEach((otherItem) => {
         if (otherItem !== item) {
           otherItem.classList.remove('open');
+          const otherQ = qs('.faq-item__question', otherItem);
           const otherAnswer = qs('.faq-item__answer', otherItem);
+          if (otherQ) otherQ.setAttribute('aria-expanded', 'false');
           if (otherAnswer) otherAnswer.style.maxHeight = '';
         }
       });
 
       if (isOpen) {
         item.classList.remove('open');
+        question.setAttribute('aria-expanded', 'false');
         answer.style.maxHeight = '';
       } else {
         item.classList.add('open');
+        question.setAttribute('aria-expanded', 'true');
         answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    }
+
+    question.addEventListener('click', toggleFAQ);
+
+    // Support Space and Enter keypresses
+    question.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleFAQ();
       }
     });
   });
