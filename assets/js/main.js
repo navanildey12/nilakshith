@@ -41,11 +41,9 @@ function initPreloader() {
   `;
 
   const done = () => {
-    loader.addEventListener('transitionend', () => {
-      loader.remove();
-    }, { once: true });
-    loader.style.transition = 'opacity 0.3s ease';
-    loader.style.opacity = '0';
+    // Add loaded class to trigger CSS fade-out transition
+    loader.classList.add('loaded');
+    // Prevent screen reader interference once loaded
     loader.setAttribute('aria-hidden', 'true');
   };
 
@@ -276,10 +274,9 @@ function initFAQ() {
         question.setAttribute('aria-expanded', 'false');
         answer.style.maxHeight = '';
       } else {
-        const height = answer.scrollHeight;
         item.classList.add('open');
         question.setAttribute('aria-expanded', 'true');
-        answer.style.maxHeight = height + 'px';
+        answer.style.maxHeight = answer.scrollHeight + 'px';
       }
     }
 
@@ -370,7 +367,7 @@ function initWhatsAppModal() {
   let modalOverlay = qs('.wa-modal-overlay');
   if (!modalOverlay) {
     const modalHTML = `
-      <div class="wa-modal-overlay" id="wa-choice-modal" aria-hidden="true" inert role="dialog" aria-modal="true" aria-labelledby="wa-modal-title-id">
+      <div class="wa-modal-overlay" id="wa-choice-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wa-modal-title-id">
         <div class="wa-modal-card">
           <div class="wa-modal-header">
             <span class="wa-modal-title" id="wa-modal-title-id">How can we help you?</span>
@@ -443,7 +440,6 @@ function initWhatsAppModal() {
   function openModal(e) {
     e.preventDefault();
     modalOverlay.classList.add('open');
-    modalOverlay.removeAttribute('inert');
     modalOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     
@@ -454,7 +450,6 @@ function initWhatsAppModal() {
 
   function closeModal() {
     modalOverlay.classList.remove('open');
-    modalOverlay.setAttribute('inert', '');
     modalOverlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     waFab.focus();
@@ -650,50 +645,75 @@ function initEnquiryForm() {
     if (btnText) btnText.textContent = 'Submitting...';
     if (btnSpinner) btnSpinner.classList.remove('hidden');
 
-    const formData = new FormData(form);
-
-    // Google Form submission action URL
+    // ── HIDDEN IFRAME SUBMISSION ─────────────────────────────────────────────
+    // fetch() + no-cors cannot reliably send a body to Google Forms — browsers
+    // discard it due to CORS pre-flight rules. The only client-side solution is
+    // to POST via a real <form> targeting a hidden <iframe>. The browser treats
+    // this as a normal navigation (no CORS), Google records the response, and
+    // the iframe just silently loads Google's "recorded" confirmation page.
+    // ─────────────────────────────────────────────────────────────────────────
     const actionURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdJ38JpziOKJ7DEL5AquCv7ao8jGfxm9RF2m8leQOoaCyuNaQ/formResponse';
 
-    fetch(actionURL, {
-      method: 'POST',
-      body: formData,
-      mode: 'no-cors'
-    })
-    .then(() => {
-      // Opaque response is expected due to CORS, treated as success
+    // 1. Create (or reuse) the hidden iframe
+    let iframe = document.getElementById('_gf_hidden_iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = '_gf_hidden_iframe';
+      iframe.name = '_gf_hidden_iframe';
+      iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute;';
+      iframe.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(iframe);
+    }
+
+    // 2. Build a temporary <form> that targets the hidden iframe
+    const tempForm = document.createElement('form');
+    tempForm.method = 'POST';
+    tempForm.action = actionURL;
+    tempForm.target = '_gf_hidden_iframe';
+    tempForm.style.display = 'none';
+
+    // 3. Copy all field values from the visible enquiry form into the temp form
+    const formData = new FormData(form);
+    formData.forEach((value, key) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      tempForm.appendChild(input);
+    });
+
+    document.body.appendChild(tempForm);
+
+    // 4. When the iframe loads Google's response page, treat it as success
+    const onIframeLoad = () => {
+      iframe.removeEventListener('load', onIframeLoad);
+
+      // Tear down
+      document.body.removeChild(tempForm);
+
+      // Reset form UI
       form.reset();
-      
-      // Reset active categories
       toggleGroup(condBroadband, false, broadbandPlan);
       toggleGroup(condCctv, false, cctvCameras);
       toggleGroup(condNetworking, false, networkingReqs);
 
-      // Populate success card name
+      // Show success card
       const successNameSpan = qs('#success-name');
       if (successNameSpan) successNameSpan.textContent = userName;
-
-      // Show success card
       form.classList.add('hidden');
       if (successCard) successCard.classList.remove('hidden');
-      
-      // Scroll to result card
       successCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    })
-    .catch((error) => {
-      console.error('Submission error:', error);
-      // Show error card
-      form.classList.add('hidden');
-      if (errorCard) errorCard.classList.remove('hidden');
-      
-      errorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    })
-    .finally(() => {
-      // Restore submit button state
+
+      // Restore button
       submitBtn.removeAttribute('disabled');
       if (btnText) btnText.textContent = 'Submit Enquiry';
       if (btnSpinner) btnSpinner.classList.add('hidden');
-    });
+    };
+
+    iframe.addEventListener('load', onIframeLoad);
+
+    // 5. Submit — this is a real HTML POST, no CORS involved
+    tempForm.submit();
   });
 
   // Reset and Retry triggers
@@ -727,29 +747,19 @@ function initCookieConsent() {
 
   const consentKey = 'cookie-consent-accepted';
 
+  // Check if consent has already been given
+  if (!localStorage.getItem(consentKey)) {
+    // Show banner after a slight delay
+    setTimeout(() => {
+      banner.classList.remove('hidden');
+    }, 1500);
+  }
+
   // Handle accept button click
   acceptBtn.addEventListener('click', () => {
     banner.classList.add('hidden');
     localStorage.setItem(consentKey, 'true');
-    banner.addEventListener('transitionend', function handler() {
-      banner.style.display = 'none';
-      banner.removeEventListener('transitionend', handler);
-    });
   });
-}
-
-// Delay cookie banner to avoid it being the LCP element
-function showCookieBanner() {
-  const consentKey = 'cookie-consent-accepted';
-  if (!localStorage.getItem(consentKey)) {
-    const banner = document.querySelector('.cookie-banner');
-    if (banner) {
-      banner.style.display = 'block';
-      // Force layout recalculation to trigger transition from display: none
-      banner.offsetHeight;
-      banner.classList.remove('hidden');
-    }
-  }
 }
 
 // Initialize on DOMContentLoaded
@@ -768,11 +778,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initEnquiryForm();
   initCookieConsent();
   initBrandsCarouselScaling();
-  initLazyReviews();
-
-  window.addEventListener('load', () => {
-    setTimeout(showCookieBanner, 500);
-  });
 });
 
 /**
@@ -784,71 +789,15 @@ function initBrandsCarouselScaling() {
   const logos = qsAll('.brand-logo', wrapper);
   if (!logos.length) return;
 
-  let wrapperWidth = 0;
-  let centerX = 0;
-  let maxDistance = 0;
-  let cachedWrapperLeft = 0;
-  const logoOffsets = [];
-
-  function measureWrapper() {
-    // Reset transforms to get correct layout offsets
-    logos.forEach(logo => {
-      logo.style.transform = '';
-      logo.style.opacity = '';
-    });
-
-    const wrapperRect = wrapper.getBoundingClientRect();
-    wrapperWidth = wrapperRect.width;
-    cachedWrapperLeft = wrapperRect.left;
-    centerX = cachedWrapperLeft + wrapperWidth / 2;
-    maxDistance = wrapperWidth / 2;
-
-    const track = qs('.brands-track', wrapper);
-    if (track) {
-      const originalTransform = track.style.transform;
-      track.style.transform = 'none';
-
-      const trackRect = track.getBoundingClientRect();
-      logoOffsets.length = 0;
-      logos.forEach(logo => {
-        const logoRect = logo.getBoundingClientRect();
-        logoOffsets.push({
-          logo,
-          width: logoRect.width,
-          offsetLeft: logoRect.left - trackRect.left
-        });
-      });
-
-      track.style.transform = originalTransform;
-    }
-  }
-
-  window.addEventListener('resize', measureWrapper);
-  measureWrapper(); // initial measure
-
   function updateScales() {
-    const track = qs('.brands-track', wrapper);
-    if (!track || !logoOffsets.length) {
-      requestAnimationFrame(updateScales);
-      return;
-    }
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const wrapperWidth = wrapperRect.width;
+    const centerX = wrapperRect.left + wrapperWidth / 2;
+    const maxDistance = wrapperWidth / 2;
 
-    // Get current horizontal displacement from computed transform (composited, no reflow!)
-    const style = window.getComputedStyle(track);
-    const transform = style.transform || style.webkitTransform;
-    let translateX = 0;
-    if (transform && transform !== 'none') {
-      const matrix = transform.match(/matrix.*\((.+)\)/);
-      if (matrix) {
-        const values = matrix[1].split(',');
-        translateX = parseFloat(values[4]) || 0;
-      }
-    }
-
-    const trackLeft = cachedWrapperLeft + translateX;
-
-    logoOffsets.forEach(({ logo, width, offsetLeft }) => {
-      const logoCenterX = trackLeft + offsetLeft + width / 2;
+    logos.forEach(logo => {
+      const rect = logo.getBoundingClientRect();
+      const logoCenterX = rect.left + rect.width / 2;
       const distanceFromCenter = Math.abs(centerX - logoCenterX);
 
       // Normalized distance (0 at center, 1 at edges)
@@ -886,52 +835,6 @@ function initBrandsCarouselScaling() {
   if (!prefersReducedMotion) {
     requestAnimationFrame(updateScales);
   }
-}
-
-/**
- * 16. DYNAMIC MAP LOADER (On click placeholder)
- */
-window.loadRealMap = function(id) {
-  const placeholder = document.getElementById('map-placeholder-' + id);
-  const realMap = document.getElementById('map-real-' + id);
-  if (placeholder && realMap) {
-    placeholder.style.display = 'none';
-    realMap.style.display = 'block';
-    let url = '';
-    if (id === 'index') {
-      url = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d350000!2d92.54!3d24.80!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x374e4bf68d1d8b05%3A0xfc15cedc07960658!2sNILAKSHITH%20ENTERPRISE!5e0!3m2!1sen!2sin!4v1718500000000';
-    } else if (id === 'contact') {
-      url = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.3!2d92.7847028!3d24.8025006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x374e4bf68d1d8b05%3A0xfc15cedc07960658!2sNILAKSHITH%20ENTERPRISE!5e0!3m2!1sen!2sin!4v1';
-    }
-    realMap.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="border:0; display:block;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Nilakshith Enterprise location Map"></iframe>`;
-  }
-};
-
-/**
- * 17. LAZY SOCIAL REVIEWS LOADER
- */
-function initLazyReviews() {
-  const container = document.getElementById('tagembed-container');
-  if (!container) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        observer.disconnect();
-        container.innerHTML = `
-          <iframe
-            src="https://widget.tagembed.com/328135?website=1"
-            allow="fullscreen"
-            style="width:100%;height:100%;overflow:auto;border:none;"
-            title="Nilakshith Enterprise - Google Customer Reviews"
-            loading="lazy">
-          </iframe>
-        `;
-      }
-    });
-  }, { rootMargin: '200px' });
-
-  observer.observe(container);
 }
 
 
