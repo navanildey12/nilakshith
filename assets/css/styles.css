@@ -1795,9 +1795,9 @@ header {
 }
 
 .footer__refrens-badge {
-  height: 25px;
+  height: 35px;
   width: auto;
-  max-width: 100px;
+  max-width: 140px;
   object-fit: contain;
   opacity: 0.75;
   transition: opacity var(--transition-base);
